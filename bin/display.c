@@ -15,7 +15,7 @@ static void draw_info(t_2d *vec, double *i) {
 	}
 }
 
-static t_color	get_color(int hmax, int h)
+static t_color	get_color(int hmax, int hmin, int h)
 {
 	t_color out;
 	t_color max;
@@ -24,6 +24,8 @@ static t_color	get_color(int hmax, int h)
 	max.color = MAXC;
 	out.color = 0;
 	min.color = MINC;
+	h -= hmin;
+	hmax -= hmin;
 	if (hmax)
 	{
 		out.rgb.r = min.rgb.r + h * (max.rgb.r - min.rgb.r) / hmax;
@@ -63,8 +65,8 @@ void	drawline(t_map *map, t_2d pt1, t_2d pt2)
 	t_color end;
 	double cvec[6];
 
-	start = get_color(map->hmax, pt1.h);
-	end = get_color(map->hmax, pt2.h);
+	start = get_color(map->hmax, map->hmin, pt1.h);
+	end = get_color(map->hmax, map->hmin, pt2.h);
 	vec = (t_2d){pt2.x - pt1.x, pt2.y - pt1.y, 0};
 	draw_info(&vec, &i);
 	cvecinit(cvec, i, start, end);

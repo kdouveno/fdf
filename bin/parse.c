@@ -15,7 +15,7 @@ static int		add_line(t_set2d **set, size_t len)
 	return (0);
 }
 
-static int		ft_map(char **tab, t_set2d **set, size_t len, int *hmax)
+static int		ft_map(char **tab, t_set2d **set, size_t len, t_map *map)
 {
 	static int	y;
 	int			x;
@@ -28,8 +28,15 @@ static int		ft_map(char **tab, t_set2d **set, size_t len, int *hmax)
 	{
 		an = atan2(y, x) + M_PI_4;
 		(*set)->pts[x].h = ft_atoi(tab[x]);
-		if ((*set)->pts[x].h > *hmax)
-			*hmax = (*set)->pts[x].h;
+		if (y == 0 && x == 0)
+		{
+			map->hmax = (*set)->pts[x].h;
+			map->hmin = (*set)->pts[x].h;
+		}
+		if ((*set)->pts[x].h > map->hmax)
+			map->hmax = (*set)->pts[x].h;
+		if ((*set)->pts[x].h < map->hmin)
+			map->hmin = (*set)->pts[x].h;
 		(*set)->pts[x].x = (cos(an) * hypot(x, y));
 		(*set)->pts[x].y = ((sin(an) * hypot(x, y)) - (*set)->pts[x].h * MZ) * MY;
 		x++;
@@ -126,8 +133,8 @@ int				parse(int fd, t_map *map)
 	char	*line;
 	char	**tab;
 	size_t	i;
+	int		first;
 
-	map->hmax = 0;
 	map->len = 0;
 	while (get_next_line(fd, &line))
 	{
@@ -138,9 +145,8 @@ int				parse(int fd, t_map *map)
 		if (i != map->len && map->len != 0)
 			return (1);
 		map->len = i;
-		if (ft_map(tab, &(map->set), map->len, &(map->hmax)))
+		if (ft_map(tab, &(map->set), map->len, map))
 			return (1);
-
 	}
 	resize(map->set, map->len);
 	return (0);
